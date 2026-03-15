@@ -1,6 +1,6 @@
 # Peninsular War Interactive Map
 
-![Version](https://img.shields.io/badge/Version-1.0.2-blue?style=flat-square)
+![Version](https://img.shields.io/badge/Version-1.0.3-blue?style=flat-square)
 ![React](https://img.shields.io/badge/React-19.2.4-61DAFB?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178C6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8.0.0-646CFF?logo=vite&logoColor=white)

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pgarriga.github.io/peninsular-war-interactive-map/sitemap.xml
