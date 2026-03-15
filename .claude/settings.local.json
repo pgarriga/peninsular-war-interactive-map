@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(lsof:*)",
+      "Bash(cd:*)",
+      "Bash(grep -n \"useCallback\\\\|useEffect\\\\|useState\" src/components/*.tsx)",
+      "Bash(cd /Users/pgarriga/Development/Others/Peninsular\\\\ War\\\\ Interactive\\\\ Map:*)",
+      "Bash(grep -n \"img\\\\|Image\" src/components/*.tsx src/App.tsx)",
+      "Bash(pnpm tsc:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

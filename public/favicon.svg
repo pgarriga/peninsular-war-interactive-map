@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+  <defs>
+    <linearGradient id="sword" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c41e3a"/>
+      <stop offset="100%" style="stop-color:#8b0000"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#sword)" d="M6.2 2L2 6.2l1.5 1.5 1.5-1.5 6.3 6.3-6.3 6.3-1.5-1.5L2 18.8 6.2 23l1.5-1.5-1.5-1.5 6.3-6.3 6.3 6.3-1.5 1.5L18.8 23 23 18.8l-1.5-1.5-1.5 1.5-6.3-6.3 6.3-6.3 1.5 1.5L23 6.2 18.8 2l-1.5 1.5 1.5 1.5-6.3 6.3L6.2 5l1.5-1.5L6.2 2z"/>
+</svg>
