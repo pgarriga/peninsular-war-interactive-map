@@ -1,0 +1,119 @@
+name: Auto Release
+
+on:
+  push:
+    branches: ['main']
+    paths:
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get package.json version
+        id: package_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Package.json version: $VERSION"
+
+      - name: Get latest release version
+        id: latest_release
+        run: |
+          LATEST=$(gh release view --json tagName -q '.tagName' 2>/dev/null || echo "none")
+          # Remove 'v' prefix if present
+          LATEST_VERSION=${LATEST#v}
+          echo "latest=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          echo "Latest release: $LATEST_VERSION"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compare versions
+        id: compare
+        run: |
+          PKG_VERSION="${{ steps.package_version.outputs.version }}"
+          LATEST="${{ steps.latest_release.outputs.latest }}"
+
+          if [ "$LATEST" = "none" ] || [ -z "$LATEST" ]; then
+            echo "No previous release found, will create first release"
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Compare versions using sort -V
+          HIGHER=$(printf '%s\n%s' "$PKG_VERSION" "$LATEST" | sort -V | tail -n1)
+
+          if [ "$HIGHER" = "$PKG_VERSION" ] && [ "$PKG_VERSION" != "$LATEST" ]; then
+            echo "New version detected: $PKG_VERSION > $LATEST"
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          else
+            echo "No new version: $PKG_VERSION <= $LATEST"
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup pnpm
+        if: steps.compare.outputs.should_release == 'true'
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node
+        if: steps.compare.outputs.should_release == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        if: steps.compare.outputs.should_release == 'true'
+        run: pnpm install
+
+      - name: Build
+        if: steps.compare.outputs.should_release == 'true'
+        run: pnpm build
+
+      - name: Create release archive
+        if: steps.compare.outputs.should_release == 'true'
+        run: |
+          cd dist
+          zip -r ../peninsular-war-interactive-map-${{ steps.package_version.outputs.version }}.zip .
+          cd ..
+
+      - name: Generate release notes
+        if: steps.compare.outputs.should_release == 'true'
+        id: release_notes
+        run: |
+          VERSION="${{ steps.package_version.outputs.version }}"
+          LATEST="${{ steps.latest_release.outputs.latest }}"
+
+          echo "## What's Changed" > release_notes.md
+          echo "" >> release_notes.md
+
+          if [ "$LATEST" != "none" ] && [ -n "$LATEST" ]; then
+            git log v${LATEST}..HEAD --pretty=format:"- %s" --no-merges >> release_notes.md || true
+          else
+            git log --pretty=format:"- %s" --no-merges -10 >> release_notes.md
+          fi
+
+          echo "" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/v${LATEST}...v${VERSION}" >> release_notes.md
+
+      - name: Create Release
+        if: steps.compare.outputs.should_release == 'true'
+        run: |
+          gh release create "v${{ steps.package_version.outputs.version }}" \
+            --title "v${{ steps.package_version.outputs.version }}" \
+            --notes-file release_notes.md \
+            peninsular-war-interactive-map-${{ steps.package_version.outputs.version }}.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

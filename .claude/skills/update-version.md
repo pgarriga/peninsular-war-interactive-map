@@ -33,7 +33,12 @@ Update the README badge to:
 
 Run this skill after:
 - Incrementing the version in package.json
-- Releasing a new version
 - Running `npm version` or `pnpm version` commands
 
 After updating, confirm the version change was applied.
+
+## Auto Release
+
+When the version in package.json is higher than the latest GitHub release, a new release is automatically created on push to main. The release includes:
+- Built distribution zip file
+- Auto-generated release notes from commits
