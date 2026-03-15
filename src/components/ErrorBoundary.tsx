@@ -1,4 +1,4 @@
-import { Component, ReactNode } from 'react';
+import { Component, type ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -37,7 +37,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <button onClick={() => window.location.reload()}>
             Refresh Page
           </button>
-          {process.env.NODE_ENV === 'development' && this.state.error && (
+          {import.meta.env.DEV && this.state.error && (
             <details>
               <summary>Error details</summary>
               <pre>{this.state.error.message}</pre>
