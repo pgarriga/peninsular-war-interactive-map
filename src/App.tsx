@@ -98,6 +98,7 @@ function App() {
 
   // Reset index when filters change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentEventIndex(-1);
     setIsPlaying(false);
   }, [searchTerm, categoryFilter]);

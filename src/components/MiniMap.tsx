@@ -10,11 +10,10 @@ import {
 
 function MinimapBounds({ parentMap }: { parentMap: L.Map }) {
   const minimap = useMap();
-  const [bounds, setBounds] = useState<LatLngBounds | null>(null);
+  const [bounds, setBounds] = useState<LatLngBounds>(() => parentMap.getBounds());
 
   const updateBounds = useCallback(() => {
-    const newBounds = parentMap.getBounds();
-    setBounds(newBounds);
+    setBounds(parentMap.getBounds());
   }, [parentMap]);
 
   useMapEvent('moveend', updateBounds);
@@ -22,7 +21,6 @@ function MinimapBounds({ parentMap }: { parentMap: L.Map }) {
   useEffect(() => {
     parentMap.on('move', updateBounds);
     parentMap.on('zoom', updateBounds);
-    updateBounds();
     return () => {
       parentMap.off('move', updateBounds);
       parentMap.off('zoom', updateBounds);
@@ -36,8 +34,6 @@ function MinimapBounds({ parentMap }: { parentMap: L.Map }) {
   useEffect(() => {
     minimap.setView(MINIMAP_CENTER, MINIMAP_ZOOM);
   }, [minimap]);
-
-  if (!bounds) return null;
 
   return (
     <Rectangle
